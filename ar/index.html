@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>ONE Swisstek</title>
+<meta name="theme-color" content="#E41F26">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ONE Swisstek">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<style>
+:root{--ink:#15181C;--stone:#6E7780;--ghost:#A3ABB3;--hair:#DFE3E7;--mist:#EBEEF1;--red:#E41F26;--red-deep:#B9151B;--paper:#fff;
+  --sans:-apple-system,"SF Pro Text","Helvetica Neue",Arial,sans-serif;--serif:"New York","Iowan Old Style",Georgia,serif;--mono:"SF Mono",Menlo,monospace}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#fff;color:var(--ink);font-family:var(--sans);overscroll-behavior:none}
+button{font:inherit;color:inherit;cursor:pointer}
+.sc{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ghost)}
+.red{color:var(--red)}
+/* screens */
+.screen{position:fixed;inset:0;display:none;flex-direction:column;background:#fff}
+.screen.on{display:flex}
+.pad{padding:calc(env(safe-area-inset-top) + 22px) 24px calc(env(safe-area-inset-bottom) + 22px)}
+h1{font-family:var(--serif);font-weight:400;font-size:38px;line-height:1.05;margin:0;letter-spacing:-.01em}
+h1 em{font-style:italic;color:var(--red)}
+p{margin:0}
+.body{font-size:14px;line-height:1.55;color:var(--stone)}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px 20px;border:0;background:var(--red);color:#fff;font-size:16px;font-weight:600;letter-spacing:.01em;border-radius:999px}
+.btn:active{background:var(--red-deep)}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--hair)}
+.cards{display:grid;gap:10px}
+.card{display:grid;grid-template-columns:54px 1fr;gap:14px;align-items:center;border:1px solid var(--hair);padding:12px 14px;border-radius:14px}
+.card .pg{font-family:var(--serif);font-size:24px;text-align:center;line-height:1}
+.card .pg small{display:block;font-family:var(--mono);font-size:8.5px;letter-spacing:.2em;color:var(--ghost);margin-top:4px}
+.card b{display:block;font-weight:600;font-size:14px}
+.card span{font-size:12px;color:var(--stone)}
+input{font:inherit;font-size:16px;padding:12px 14px;border:1px solid var(--hair);border-radius:10px;width:100%;background:#fff;color:var(--ink)}
+input:focus{outline:2px solid var(--red);border-color:var(--red)}
+/* AR */
+#arview{position:fixed;inset:0;background:#000;display:none}
+#arview.on{display:block}
+#arview video{object-fit:cover}
+.hud{position:fixed;left:0;right:0;top:0;padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;display:flex;justify-content:space-between;align-items:center;z-index:20;pointer-events:none}
+.hud>*{pointer-events:auto}
+.pill{background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-radius:999px;padding:8px 14px 8px 8px;display:flex;align-items:center;gap:10px;font-size:12px;font-weight:600;box-shadow:0 6px 24px -10px rgba(0,0,0,.5)}
+.pill .dot{width:22px;height:22px;border-radius:50%;background:var(--red);display:grid;place-items:center}
+.pill .dot svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round}
+.iconbtn{width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);display:grid;place-items:center;box-shadow:0 6px 24px -10px rgba(0,0,0,.5)}
+.iconbtn svg{width:18px;height:18px;stroke:var(--ink);fill:none;stroke-width:2;stroke-linecap:round}
+#scan{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 24px);display:flex;flex-direction:column;align-items:center;gap:12px;z-index:20;pointer-events:none;transition:opacity .3s}
+#scan.hide{opacity:0}
+.frame{width:220px;height:156px;position:relative}
+.frame i{position:absolute;width:26px;height:26px;border:2.5px solid #fff;border-radius:3px}
+.frame i:nth-child(1){left:0;top:0;border-right:0;border-bottom:0}.frame i:nth-child(2){right:0;top:0;border-left:0;border-bottom:0}.frame i:nth-child(3){left:0;bottom:0;border-right:0;border-top:0}.frame i:nth-child(4){right:0;bottom:0;border-left:0;border-top:0}
+.frame .line{position:absolute;left:8px;right:8px;top:0;height:2px;background:var(--red);animation:sweep 2.2s ease-in-out infinite}
+@keyframes sweep{0%{top:6px}50%{top:146px}100%{top:6px}}
+#scan p{color:#fff;font-size:13px;font-weight:600;text-shadow:0 1px 6px rgba(0,0,0,.6)}
+/* sheets */
+.sheet{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 12px);background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border-radius:20px;padding:16px 16px 14px;z-index:25;box-shadow:0 20px 50px -20px rgba(0,0,0,.5);transform:translateY(120%);transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.sheet.on{transform:none}
+.sheet .t{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.sheet .t b{font-family:var(--serif);font-weight:400;font-size:19px}
+.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.chip{border:1px solid var(--hair);border-radius:12px;padding:8px 10px;display:flex;gap:9px;align-items:center;background:#fff;text-align:left}
+.chip i{width:26px;height:26px;border-radius:6px;background:var(--c);flex:none}
+.chip b{font-size:12px;font-weight:600;line-height:1.1}
+.chip.on{border-color:var(--red);box-shadow:0 0 0 1px var(--red)}
+.layers{display:grid;gap:6px}
+.layers>div{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:baseline;font-size:13px;padding:5px 0;border-bottom:1px solid var(--hair)}
+.layers>div:last-child{border-bottom:0}
+.layers .k{font-family:var(--mono);font-size:10px;color:var(--red)}
+.layers .s{font-family:var(--mono);font-size:9px;color:var(--ghost);letter-spacing:.06em}
+.layers b{font-weight:600}
+.layers>div.on b{color:var(--red)}
+form.lead{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+form.lead label{display:flex;flex-direction:column;gap:4px;font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--stone)}
+form.lead .w{grid-column:1/-1}
+.done{display:none;padding:10px 0 4px}
+.sheet.sent form{display:none}.sheet.sent .done{display:block}
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 70px);transform:translateX(-50%);background:var(--ink);color:#fff;font-size:12px;padding:8px 14px;border-radius:999px;z-index:30;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.on{opacity:1}
+.hint{display:flex;gap:12px;align-items:flex-start;background:var(--mist);padding:12px 14px;border-radius:12px;font-size:12px;color:var(--stone);line-height:1.45}
+.hint b{color:var(--ink)}
+</style>
+<script type="importmap">{"imports":{"three":"./vendor/three.module.js","mindar-image-three":"./vendor/mindar/mindar-image-three.prod.js","three/addons/":"./vendor/addons/"}}</script>
+</head>
+<body>
+
+<!-- GATE -->
+<section class="screen on pad" id="gate" style="justify-content:center;gap:18px">
+  <img src="assets/logo.png" alt="Swisstek" style="width:150px">
+  <div>
+    <div class="sc">ONE Swisstek · sample edition</div>
+    <h1 style="margin-top:10px">Private <em>preview.</em></h1>
+  </div>
+  <p class="body">This is a working concept for client review, not a released app. Enter the passphrase from the proposal to continue.</p>
+  <input id="pass" type="password" placeholder="Passphrase" autocomplete="off" autocapitalize="none">
+  <button class="btn" id="gateBtn">Continue</button>
+  <p class="sc" id="gateMsg" style="color:var(--red);min-height:14px"></p>
+</section>
+
+<!-- HOME -->
+<section class="screen pad" id="home" style="gap:18px;overflow:auto">
+  <div style="display:flex;justify-content:space-between;align-items:center"><img src="assets/logo.png" alt="Swisstek" style="width:120px"><span class="sc">Sample · v0.1</span></div>
+  <div>
+    <div class="sc">ONE Swisstek</div>
+    <h1 style="margin-top:10px">Point it at the <em>page.</em></h1>
+  </div>
+  <p class="body">Hold the phone over a marked page of the Swisstek business profile. The page is recognised in a second or two and the content lifts off the paper.</p>
+  <div class="cards">
+    <div class="card"><div class="pg">14<small>page</small></div><div><b>Tile installation system</b><span>The floor comes apart, five layers, each one named.</span></div></div>
+    <div class="card"><div class="pg">19<small>page</small></div><div><b>Swissparkett</b><span>Switch the timber and watch the floor change on the page.</span></div></div>
+    <div class="card"><div class="pg">25<small>page</small></div><div><b>Talk to us</b><span>Your card, floating over the back cover, one tap to send.</span></div></div>
+  </div>
+  <button class="btn" id="startBtn"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>Open the camera</button>
+  <div class="hint" id="iosHint"><span style="font-size:18px">↥</span><span><b>Make it an app.</b> In Safari tap Share, then Add to Home Screen. It installs as ONE Swisstek with its own icon and opens full screen.</span></div>
+  <p class="sc" style="text-align:center">Works on paper, on a laptop screen, or on another phone</p>
+</section>
+
+<!-- AR -->
+<div id="arview"></div>
+<div class="hud" id="hud" style="display:none">
+  <div class="pill"><span class="dot"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></span><span id="pillTxt">Looking for a page</span></div>
+  <button class="iconbtn" id="closeBtn" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+</div>
+<div id="scan" style="display:none"><div class="frame"><i></i><i></i><i></i><i></i><div class="line"></div></div><p>Point at page 14, 19 or 25</p></div>
+<div class="toast" id="toast"></div>
+
+<!-- sheet: layers (page 14) -->
+<div class="sheet" id="sheetLayers">
+  <div class="t"><b>Tile installation system</b><button class="chip" id="toggleLayers" style="padding:6px 12px;border-radius:999px"><b>Assemble</b></button></div>
+  <div class="layers" id="layerList">
+    <div data-n="4"><span class="k">05</span><b>Swisstek Grout Sealer</b><span class="s">200 ml</span></div>
+    <div data-n="3"><span class="k">04</span><b>Polymer Modified Tile Grout</b><span class="s">CG2WA · SLS 1376</span></div>
+    <div data-n="2"><span class="k">03</span><b>Tile, client supplied</b><span class="s">porcelain</span></div>
+    <div data-n="1"><span class="k">02</span><b>Super Plus Tile Adhesive</b><span class="s">C2T · SLS 1375</span></div>
+    <div data-n="0"><span class="k">01</span><b>Substrate</b><span class="s">cement screed</span></div>
+  </div>
+</div>
+
+<!-- sheet: timber (page 19) -->
+<div class="sheet" id="sheetWood">
+  <div class="t"><b>Swissparkett</b><span class="sc" id="woodName">Burma Teak</span></div>
+  <div class="chips" id="woodChips"></div>
+  <p class="sc" style="margin-top:10px">Timber tones indicative, not finish samples</p>
+</div>
+
+<!-- sheet: lead (page 25) -->
+<div class="sheet" id="sheetLead">
+  <div class="t"><b>Share your card</b><span class="sc red">Sample · nothing is sent</span></div>
+  <form class="lead" id="leadForm" novalidate>
+    <label>Name<input id="lf-name" placeholder="Your name" autocomplete="name"></label>
+    <label>Company<input id="lf-co" placeholder="Practice or company"></label>
+    <label class="w">Phone or email<input id="lf-contact" placeholder="How should we reach you?"></label>
+    <button class="btn w" type="submit">Send to Swisstek</button>
+  </form>
+  <div class="done"><div class="sc red">Received</div><p style="font-family:var(--serif);font-size:19px;margin-top:6px" id="doneMsg">Thank you. A Swisstek expert will be in touch.</p><p class="body" style="margin-top:6px;font-size:12px">In production this lands with the sales team as a lead tagged with page 25 and the product of interest.</p><button class="btn ghost" style="margin-top:10px" id="leadAgain">Fill it again</button></div>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
